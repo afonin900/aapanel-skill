@@ -132,7 +132,7 @@ bash scripts/aapanel_api.sh nodejs start_project '{"project_name":"meu-app"}'
 // src/lib/supabase.ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://168.231.92.99:8000'  // ou domínio configurado
+const supabaseUrl = 'https://YOUR_SERVER_IP:8000'  // ou domínio configurado
 const supabaseKey = 'seu-anon-key'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)

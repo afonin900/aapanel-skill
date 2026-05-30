@@ -1,20 +1,19 @@
-# aaPanel API — Catálogo Completo de Endpoints
+# aaPanel API — Полный каталог endpoints
 
-**Servidor:** `https://168.231.92.99:17198`
-**Método:** Todos os endpoints usam **POST**
+**Метод:** Все endpoints используют **POST**
 **Content-Type:** `application/x-www-form-urlencoded`
 
-## Autenticação
+## Аутентификация
 
-Cada requisição deve incluir:
+Каждый запрос должен содержать:
 
-| Parâmetro | Valor |
-|-----------|-------|
-| `request_time` | Unix timestamp (ex: `1711900000`) |
+| Параметр | Значение |
+|----------|----------|
+| `request_time` | Unix timestamp (например: `1711900000`) |
 | `request_token` | `md5(str(request_time) + md5(api_key))` |
 
-**API Key:** Configurada no painel em Settings > API Interface.
-**IP Whitelist:** O IP chamador deve estar na whitelist do painel.
+**API Key:** Настраивается в панели в Settings > API Interface. Хранится в `~/.aapanel/servers.conf`.
+**IP Whitelist:** IP вызывающей машины должен быть в whitelist панели.
 
 ---
 

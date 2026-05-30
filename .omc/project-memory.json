@@ -1,0 +1,201 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1780120988141,
+  "projectRoot": "/Users/afonin900/Github/aapanel-skill",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "examples",
+      "scripts"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 8,
+      "lastAccessed": 1780120988103,
+      "keyFiles": [
+        "01-instalacao.md",
+        "02-autenticacao.md",
+        "03-guia-rapido.md",
+        "04-categorias-api.md",
+        "05-deploy-react-typescript.md"
+      ]
+    },
+    "examples": {
+      "path": "examples",
+      "purpose": "Example code",
+      "fileCount": 4,
+      "lastAccessed": 1780120988121,
+      "keyFiles": [
+        "backup-automatico.sh",
+        "deploy-react-app.sh",
+        "setup-completo.sh",
+        "setup-supabase-docker.sh"
+      ]
+    },
+    "references": {
+      "path": "references",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1780120988122,
+      "keyFiles": [
+        "api-catalog.md",
+        "supabase-react-setup.md"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1780120988123,
+      "keyFiles": [
+        "aapanel_api.sh"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "scripts/aapanel_api.sh",
+      "accessCount": 5,
+      "lastAccessed": 1780121190805,
+      "type": "file"
+    },
+    {
+      "path": "install.sh",
+      "accessCount": 3,
+      "lastAccessed": 1780121214422,
+      "type": "file"
+    },
+    {
+      "path": "references/api-catalog.md",
+      "accessCount": 3,
+      "lastAccessed": 1780121492925,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 2,
+      "lastAccessed": 1780121262394,
+      "type": "file"
+    },
+    {
+      "path": "SKILL.md",
+      "accessCount": 2,
+      "lastAccessed": 1780121296112,
+      "type": "file"
+    },
+    {
+      "path": "docs/05-deploy-react-typescript.md",
+      "accessCount": 2,
+      "lastAccessed": 1780121405762,
+      "type": "file"
+    },
+    {
+      "path": "docs/06-supabase-setup.md",
+      "accessCount": 2,
+      "lastAccessed": 1780121428757,
+      "type": "file"
+    },
+    {
+      "path": "docs/07-troubleshooting.md",
+      "accessCount": 2,
+      "lastAccessed": 1780121451344,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 2,
+      "lastAccessed": 1780121513854,
+      "type": "file"
+    },
+    {
+      "path": "docs/01-instalacao.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121058230,
+      "type": "file"
+    },
+    {
+      "path": "docs/02-autenticacao.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121058676,
+      "type": "file"
+    },
+    {
+      "path": "docs/03-guia-rapido.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121222430,
+      "type": "file"
+    },
+    {
+      "path": "docs/04-categorias-api.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121223441,
+      "type": "file"
+    },
+    {
+      "path": "docs/08-seguranca.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121225098,
+      "type": "file"
+    },
+    {
+      "path": "docs/01-установка.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121306990,
+      "type": "file"
+    },
+    {
+      "path": "docs/02-аутентификация.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121322818,
+      "type": "file"
+    },
+    {
+      "path": "docs/03-быстрый-старт.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121350117,
+      "type": "file"
+    },
+    {
+      "path": "docs/04-категории-api.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121383444,
+      "type": "file"
+    },
+    {
+      "path": "docs/08-безопасность.md",
+      "accessCount": 1,
+      "lastAccessed": 1780121467411,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

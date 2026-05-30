@@ -1,24 +1,19 @@
-# Troubleshooting
+# Решение проблем
 
-Problemas comuns e como resolver.
+Типичные проблемы и способы их устранения.
 
-## Erro de autenticacao
+## Ошибки аутентификации
 
-### "Invalid token" ou "Token expired"
+### "Invalid token" или "Token expired"
 
-**Causa**: O timestamp do seu computador esta dessincronizado com o servidor.
+**Причина**: Время на вашем компьютере не синхронизировано с сервером.
 
-**Solucao**:
+**Решение**:
 ```bash
-# Verificar hora local
+# Проверить локальное время
 date
 
-# Verificar hora do servidor
-bash scripts/aapanel_api.sh system GetSystemTotal | python3 -c "import sys,json; print(json.load(sys.stdin))"
-```
-
-Se houver diferenca significativa, sincronize o relogio:
-```bash
+# Синхронизировать часы
 # macOS
 sudo sntp -sS time.apple.com
 
@@ -28,150 +23,166 @@ sudo ntpdate -u ntp.ubuntu.com
 
 ### "IP not in whitelist"
 
-**Causa**: O IP da sua maquina nao esta na whitelist do aaPanel.
+**Причина**: IP вашей машины не добавлен в whitelist aaPanel.
 
-**Solucao**:
-1. Descubra seu IP: `curl -s https://api.ipify.org`
-2. Acesse o painel: `https://168.231.92.99:17198`
-3. Va em **Settings > API Interface > IP Whitelist**
-4. Adicione seu IP
+**Решение**:
+1. Узнайте ваш IP: `curl -s https://api.ipify.org`
+2. Откройте панель aaPanel в браузере
+3. Перейдите в **Settings > API Interface > IP Whitelist**
+4. Добавьте ваш IP
 
-**Nota**: Se seu IP muda frequentemente (conexao dinamica), considere usar um VPN com IP fixo.
+**Заметка**: Если IP меняется часто (динамический), используйте VPN с фиксированным IP.
+
+### Сервер не найден в конфиге
+
+```bash
+# Проверить список серверов
+aapanel servers list
+
+# Добавить сервер
+aapanel servers add hetzner https://YOUR_IP:17198 YOUR_API_KEY default
+```
 
 ---
 
-## Erro de conexao
+## Ошибки подключения
 
-### "Connection refused" ou timeout
+### "Connection refused" или timeout
 
-**Possiveis causas**:
-1. Servidor desligado
-2. Porta 17198 bloqueada no firewall do servidor
-3. Firewall do ISP bloqueando a porta
+**Возможные причины**:
+1. Сервер выключен
+2. Порт 17198 заблокирован в firewall сервера
+3. Firewall провайдера блокирует порт
 
-**Verificar conectividade**:
+**Проверить доступность**:
 ```bash
-# Testar porta
-nc -zv 168.231.92.99 17198
+# Проверить порт
+nc -zv YOUR_SERVER_IP 17198
 
-# Testar com curl
-curl -sk https://168.231.92.99:17198/ -o /dev/null -w "%{http_code}"
+# Проверить через curl
+curl -sk https://YOUR_SERVER_IP:17198/ -o /dev/null -w "%{http_code}"
 ```
 
 ### "SSL certificate problem"
 
-**Causa**: O aaPanel usa certificado auto-assinado.
+**Причина**: aaPanel использует self-signed сертификат.
 
-**Solucao**: O script `aapanel_api.sh` ja usa `-k` (insecure) no curl. Se usar outro metodo, desabilite a verificacao SSL.
+**Решение**: Скрипт `aapanel_api.sh` уже использует `-k` (insecure) в curl. При использовании других инструментов — отключите проверку SSL.
 
 ---
 
-## Problemas com Node.js
+## Проблемы с Node.js
 
-### Projeto nao inicia
+### Проект не запускается
 
 ```bash
-# Ver logs
-bash scripts/aapanel_api.sh nodejs get_project_log '{"project_name":"MEU_PROJETO"}'
+# Посмотреть логи
+aapanel nodejs get_project_log '{"project_name":"MY_PROJECT"}'
 
-# Verificar se a porta esta em uso
-bash scripts/aapanel_api.sh nodejs check_port_is_used '{"port":"3000"}'
+# Проверить занятость порта
+aapanel nodejs check_port_is_used '{"port":"3000"}'
 
-# Reiniciar
-bash scripts/aapanel_api.sh nodejs restart_project '{"project_name":"MEU_PROJETO"}'
+# Перезапустить
+aapanel nodejs restart_project '{"project_name":"MY_PROJECT"}'
 ```
 
 ### "Module not found"
 
 ```bash
-# Reinstalar dependencias
-bash scripts/aapanel_api.sh nodejs reinstall_packages '{"project_name":"MEU_PROJETO"}'
+# Переустановить зависимости
+aapanel nodejs reinstall_packages '{"project_name":"MY_PROJECT"}'
 
-# Ou rebuild
-bash scripts/aapanel_api.sh nodejs rebuild_project '{"project_name":"MEU_PROJETO"}'
+# Или пересобрать
+aapanel nodejs rebuild_project '{"project_name":"MY_PROJECT"}'
 ```
 
-### Versao do Node.js incompativel
+### Несовместимая версия Node.js
 
 ```bash
-# Ver versoes disponiveis
-bash scripts/aapanel_api.sh nodejs get_nodejs_version
+# Посмотреть доступные версии
+aapanel nodejs get_nodejs_version
 
-# Mudar versao
-bash scripts/aapanel_api.sh nodejs set_project_nodejs_version '{"project_name":"MEU_PROJETO","version":"20"}'
+# Сменить версию
+aapanel nodejs set_project_nodejs_version '{"project_name":"MY_PROJECT","version":"20"}'
 ```
 
 ---
 
-## Problemas com banco de dados
+## Проблемы с базами данных
 
-### MySQL nao conecta remotamente
+### MySQL не подключается удалённо
 
 ```bash
-# Verificar acesso
-bash scripts/aapanel_api.sh database GetDatabaseAccess '{"name":"meu_db"}'
+# Проверить доступ
+aapanel database GetDatabaseAccess '{"name":"mydb"}'
 
-# Liberar acesso (% = qualquer IP)
-bash scripts/aapanel_api.sh database SetDatabaseAccess '{"name":"meu_db","access":"%"}'
+# Разрешить доступ (% = любой IP)
+aapanel database SetDatabaseAccess '{"name":"mydb","access":"%"}'
 
-# Verificar porta no firewall
-bash scripts/aapanel_api.sh firewall GetList '{"p":1,"limit":50}'
+# Проверить порт в firewall
+aapanel firewall GetList '{"p":1,"limit":50}'
 
-# Abrir porta 3306
-bash scripts/aapanel_api.sh firewall AddAcceptPort '{"port":"3306","type":"tcp","ps":"MySQL"}'
+# Открыть порт 3306
+aapanel firewall AddAcceptPort '{"port":"3306","type":"tcp","ps":"MySQL"}'
 ```
 
-### Esqueceu a senha do banco
+### Забыли пароль от базы
 
 ```bash
-bash scripts/aapanel_api.sh database ResDatabasePassword '{"id":ID,"name":"meu_db","password":"NovaSenha123!"}'
-```
-
----
-
-## Problemas com firewall
-
-### Porta aberta mas nao acessivel
-
-Possivel conflito entre firewall classico e System Firewall v2.
-
-```bash
-# Verificar ambos
-bash scripts/aapanel_api.sh firewall GetList '{"p":1,"limit":50}'
-bash scripts/aapanel_api.sh safe get_rules_list
-
-# Info do firewall
-bash scripts/aapanel_api.sh safe get_firewall_info
+aapanel database ResDatabasePassword '{"id":ID,"name":"mydb","password":"NewPassword123!"}'
 ```
 
 ---
 
-## Problemas com SSL
+## Проблемы с firewall
 
-### Certificado nao emitido
+### Порт открыт, но недоступен
+
+Возможный конфликт между классическим firewall и System Firewall v2.
 
 ```bash
-# Verificar: o dominio aponta para o IP do servidor?
-# O site esta acessivel na porta 80?
+# Проверить оба
+aapanel firewall GetList '{"p":1,"limit":50}'
+aapanel safe get_rules_list
 
-# Tentar com DNS
-bash scripts/aapanel_api.sh ssl apply_cert_api '{"domains":["meusite.com"],"auth_type":"dns"}'
+# Информация о firewall
+aapanel safe get_firewall_info
 ```
 
 ---
 
-## Dicas gerais
+## Проблемы с SSL
 
-1. **Sempre verifique os logs** antes de tudo
-2. **Reinicie o Nginx** apos mudancas de configuracao:
+### Сертификат не выдаётся
+
+```bash
+# Убедитесь: домен указывает на IP сервера?
+# Сайт доступен на порту 80?
+
+# Попробовать через DNS
+aapanel ssl apply_cert_api '{"domains":["mysite.com"],"auth_type":"dns"}'
+```
+
+---
+
+## Общие советы
+
+1. **Всегда смотрите логи** — первый шаг при любой проблеме:
    ```bash
-   bash scripts/aapanel_api.sh system ServiceAdmin '{"name":"nginx","type":"restart"}'
+   aapanel nodejs get_project_log '{"project_name":"MY_PROJECT"}'
    ```
-3. **Verifique espaco em disco** se algo parar de funcionar:
+
+2. **Перезапустите Nginx** после изменений конфигурации:
    ```bash
-   bash scripts/aapanel_api.sh system GetDiskInfo
+   aapanel system ServiceAdmin '{"name":"nginx","type":"restart"}'
    ```
-4. **Libere memoria** se o servidor estiver lento:
+
+3. **Проверьте место на диске** если что-то перестало работать:
    ```bash
-   bash scripts/aapanel_api.sh system ReMemory
+   aapanel system GetDiskInfo
+   ```
+
+4. **Освободите память** если сервер тормозит:
+   ```bash
+   aapanel system ReMemory
    ```

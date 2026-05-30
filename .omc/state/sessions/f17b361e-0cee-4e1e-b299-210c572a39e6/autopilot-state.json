@@ -1,0 +1,10 @@
+{
+  "active": true,
+  "started_at": "2026-05-30T06:04:01.067Z",
+  "original_prompt": "autopilot issue #1",
+  "session_id": "f17b361e-0cee-4e1e-b299-210c572a39e6",
+  "project_path": "/Users/afonin900/Github/aapanel-skill",
+  "reinforcement_count": 0,
+  "awaiting_confirmation_set_at": "2026-05-30T06:04:01.067Z",
+  "last_checked_at": "2026-05-30T06:04:01.067Z"
+}

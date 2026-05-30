@@ -1,20 +1,20 @@
-# Configuracao do Supabase
+# Настройка Supabase
 
-Duas opcoes para usar Supabase com seu app React/TypeScript.
+Два варианта использования Supabase с React/TypeScript приложением.
 
-## Opcao 1: Supabase Cloud (Recomendado)
+## Вариант 1: Supabase Cloud (Рекомендуется)
 
-A forma mais simples e confiavel. O Supabase hospeda tudo para voce.
+Самый простой и надёжный вариант — Supabase берёт инфраструктуру на себя.
 
-### Passo 1: Criar projeto
+### Шаг 1: Создать проект
 
-1. Acesse https://supabase.com/dashboard
-2. Crie um novo projeto
-3. Anote as credenciais:
-   - `SUPABASE_URL` (ex: `https://xxxx.supabase.co`)
-   - `SUPABASE_ANON_KEY` (ex: `eyJhbGciOi...`)
+1. Откройте https://supabase.com/dashboard
+2. Создайте новый проект
+3. Запишите credentials:
+   - `SUPABASE_URL` (например: `https://xxxx.supabase.co`)
+   - `SUPABASE_ANON_KEY` (например: `eyJhbGciOi...`)
 
-### Passo 2: Configurar no app
+### Шаг 2: Настроить в приложении
 
 ```typescript
 // src/lib/supabase.ts
@@ -26,96 +26,96 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseKey)
 ```
 
-### Passo 3: Deploy com variaveis
+### Шаг 3: Деплой с переменными окружения
 
 ```bash
-# Configurar .env no servidor
-bash scripts/aapanel_api.sh files SaveFileBody '{
-  "path": "/www/wwwroot/meu-app/.env",
+# Создать .env на сервере
+aapanel files SaveFileBody '{
+  "path": "/www/wwwroot/my-app/.env",
   "data": "VITE_SUPABASE_URL=https://xxxx.supabase.co\nVITE_SUPABASE_ANON_KEY=eyJhbGciOi...",
   "encoding": "utf-8"
 }'
 ```
 
-### Vantagens do Cloud
+### Преимущества Cloud
 
-- Zero manutencao de infraestrutura
-- Backups automaticos
-- CDN global
-- Auth, Storage, Realtime inclusos
-- Free tier generoso
+- Нулевое обслуживание инфраструктуры
+- Автоматические резервные копии
+- Глобальный CDN
+- Auth, Storage, Realtime включены
+- Щедрый бесплатный tier
 
 ---
 
-## Opcao 2: Supabase Self-hosted (Docker)
+## Вариант 2: Supabase Self-hosted (Docker)
 
-Para ter controle total dos dados no seu servidor.
+Для полного контроля над данными на своём сервере.
 
-### Requisitos
+### Требования
 
-- Minimo **2GB RAM** e **2 CPU cores**
-- Docker instalado
-- Portas disponiveis: 5432, 8000, 3000
+- Минимум **2GB RAM** и **2 CPU cores**
+- Docker установлен
+- Свободные порты: 5432, 8000, 3000
 
-### Passo 1: Instalar Docker
-
-```bash
-bash scripts/aapanel_api.sh plugin install_plugin '{"sName":"docker","version":"latest"}'
-```
-
-### Passo 2: Preparar diretorios
+### Шаг 1: Установить Docker
 
 ```bash
-bash scripts/aapanel_api.sh files CreateDir '{"path":"/opt/supabase"}'
+aapanel plugin install_plugin '{"sName":"docker","version":"latest"}'
 ```
 
-### Passo 3: Baixar arquivos do Supabase
+### Шаг 2: Подготовить директории
+
+```bash
+aapanel files CreateDir '{"path":"/opt/supabase"}'
+```
+
+### Шаг 3: Скачать файлы Supabase
 
 ```bash
 # docker-compose.yml
-bash scripts/aapanel_api.sh files DownloadFile '{
+aapanel files DownloadFile '{
   "url": "https://raw.githubusercontent.com/supabase/supabase/master/docker/docker-compose.yml",
   "path": "/opt/supabase",
   "filename": "docker-compose.yml"
 }'
 
 # .env.example
-bash scripts/aapanel_api.sh files DownloadFile '{
+aapanel files DownloadFile '{
   "url": "https://raw.githubusercontent.com/supabase/supabase/master/docker/.env.example",
   "path": "/opt/supabase",
   "filename": ".env"
 }'
 ```
 
-### Passo 4: Configurar variaveis
+### Шаг 4: Настроить переменные
 
 ```bash
-bash scripts/aapanel_api.sh files SaveFileBody '{
+aapanel files SaveFileBody '{
   "path": "/opt/supabase/.env",
-  "data": "POSTGRES_PASSWORD=sua-senha-segura-aqui\nJWT_SECRET=seu-jwt-secret-com-pelo-menos-32-caracteres\nANON_KEY=seu-anon-key\nSERVICE_ROLE_KEY=seu-service-role-key\nSITE_URL=https://meusite.com\nAPI_EXTERNAL_URL=https://api.meusite.com\nSTUDIO_DEFAULT_ORGANIZATION=Minha Org\nSTUDIO_DEFAULT_PROJECT=Meu Projeto",
+  "data": "POSTGRES_PASSWORD=your-secure-password\nJWT_SECRET=your-jwt-secret-at-least-32-chars\nANON_KEY=your-anon-key\nSERVICE_ROLE_KEY=your-service-role-key\nSITE_URL=https://mysite.com\nAPI_EXTERNAL_URL=https://api.mysite.com\nSTUDIO_DEFAULT_ORGANIZATION=My Org\nSTUDIO_DEFAULT_PROJECT=My Project",
   "encoding": "utf-8"
 }'
 ```
 
-### Passo 5: Abrir portas
+### Шаг 5: Открыть порты
 
 ```bash
 # PostgreSQL
-bash scripts/aapanel_api.sh firewall AddAcceptPort '{"port":"5432","type":"tcp","ps":"PostgreSQL - Supabase"}'
+aapanel firewall AddAcceptPort '{"port":"5432","type":"tcp","ps":"PostgreSQL - Supabase"}'
 
 # API Gateway (Kong)
-bash scripts/aapanel_api.sh firewall AddAcceptPort '{"port":"8000","type":"tcp","ps":"Supabase API"}'
+aapanel firewall AddAcceptPort '{"port":"8000","type":"tcp","ps":"Supabase API"}'
 
 # Studio (Dashboard)
-bash scripts/aapanel_api.sh firewall AddAcceptPort '{"port":"3000","type":"tcp","ps":"Supabase Studio"}'
+aapanel firewall AddAcceptPort '{"port":"3000","type":"tcp","ps":"Supabase Studio"}'
 ```
 
-### Passo 6: Iniciar Supabase
+### Шаг 6: Запустить Supabase
 
-Crie um cron job para iniciar no boot:
+Создать cron job для автозапуска при старте сервера:
 
 ```bash
-bash scripts/aapanel_api.sh crontab AddCrontab '{
+aapanel crontab AddCrontab '{
   "name": "Start Supabase",
   "type": "startUp",
   "sBody": "cd /opt/supabase && docker compose up -d",
@@ -123,30 +123,30 @@ bash scripts/aapanel_api.sh crontab AddCrontab '{
 }'
 ```
 
-Execute imediatamente:
+Запустить немедленно:
 
 ```bash
-bash scripts/aapanel_api.sh crontab StartTask '{"id":ID_DA_TAREFA}'
+aapanel crontab StartTask '{"id":TASK_ID}'
 ```
 
-### Passo 7: Conectar do app
+### Шаг 7: Подключить из приложения
 
 ```typescript
 // src/lib/supabase.ts
 import { createClient } from '@supabase/supabase-js'
 
-// Para self-hosted, use o IP do servidor
-const supabaseUrl = 'https://168.231.92.99:8000'
-const supabaseKey = 'seu-anon-key'
+// Для self-hosted — используйте IP вашего сервера
+const supabaseUrl = 'https://YOUR_SERVER_IP:8000'
+const supabaseKey = 'your-anon-key'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 ```
 
-### Gerenciamento
+### Управление
 
 ```bash
-# Ver status dos containers (via cron)
-bash scripts/aapanel_api.sh crontab AddCrontab '{
+# Статус контейнеров (через cron)
+aapanel crontab AddCrontab '{
   "name": "Supabase Status",
   "type": "minute",
   "minute": "0",
@@ -155,26 +155,20 @@ bash scripts/aapanel_api.sh crontab AddCrontab '{
   "sType": "toShell"
 }'
 
-# Ler status
-bash scripts/aapanel_api.sh files GetFileBody '{"path":"/tmp/supabase-status.txt"}'
-
-# Reiniciar Supabase (criar e executar cron)
-# sBody: "cd /opt/supabase && docker compose restart"
-
-# Atualizar Supabase
-# sBody: "cd /opt/supabase && docker compose pull && docker compose up -d"
+# Прочитать статус
+aapanel files GetFileBody '{"path":"/tmp/supabase-status.txt"}'
 ```
 
 ---
 
-## Comparacao
+## Сравнение
 
-| Aspecto | Cloud | Self-hosted |
-|---------|-------|-------------|
-| Setup | 5 minutos | 30+ minutos |
-| Manutencao | Zero | Voce gerencia |
-| Custo | Free tier + planos | Apenas servidor |
-| Performance | CDN global | Depende do servidor |
-| Dados | Nos servidores Supabase | No seu servidor |
-| Backups | Automaticos | Manual |
-| Recomendado para | Maioria dos casos | Compliance, dados sensiveis |
+| Аспект | Cloud | Self-hosted |
+|--------|-------|-------------|
+| Настройка | 5 минут | 30+ минут |
+| Обслуживание | Нулевое | Вы управляете |
+| Стоимость | Free tier + планы | Только сервер |
+| Производительность | Глобальный CDN | Зависит от сервера |
+| Данные | На серверах Supabase | На вашем сервере |
+| Бэкапы | Автоматические | Ручные |
+| Рекомендуется для | Большинства случаев | Compliance, sensitive data |

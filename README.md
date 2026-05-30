@@ -1,122 +1,158 @@
-# aaPanel Skill para Claude Code
+# aaPanel Skill для Claude Code
 
-Skill completa para gerenciar um servidor **Linux Ubuntu** via **aaPanel** diretamente do Claude Code. Permite criar sites, gerenciar arquivos, bancos de dados, apps Node.js/React, firewall, SSL, cron jobs, backups, Docker e muito mais.
+Skill для управления Linux Ubuntu сервером через aaPanel прямо из Claude Code. Создавайте сайты, управляйте файлами, базами данных, Node.js/React приложениями, firewall, SSL, cron jobs, резервными копиями и Docker.
 
-## Visao Geral
+## Обзор
 
-| Item | Detalhe |
-|------|---------|
-| **Servidor** | `https://168.231.92.99:17198` |
-| **OS** | Linux Ubuntu |
-| **Painel** | aaPanel (BT Panel) |
-| **Metodo HTTP** | POST (todos os endpoints) |
-| **Autenticacao** | API Key + HMAC (timestamp + md5) |
+| Параметр | Значение |
+|----------|----------|
+| **ОС** | Linux Ubuntu |
+| **Панель** | aaPanel (BT Panel) |
+| **HTTP метод** | POST (все endpoints) |
+| **Аутентификация** | API Key + HMAC (timestamp + md5) |
 
-## Estrutura do Repositorio
+## Структура репозитория
 
 ```
 aapanel-skill/
-├── README.md                           # Este arquivo
-├── SKILL.md                            # Definicao da skill para Claude Code
+├── README.md                           # Этот файл
+├── SKILL.md                            # Определение skill для Claude Code
+├── install.sh                          # Установщик глобальной команды `aapanel`
 ├── scripts/
-│   └── aapanel_api.sh                  # Script CLI para chamadas autenticadas
+│   └── aapanel_api.sh                  # CLI скрипт для аутентифицированных вызовов
 ├── references/
-│   ├── api-catalog.md                  # Catalogo completo de 170+ endpoints
-│   └── supabase-react-setup.md         # Guia: Supabase + React/TypeScript
+│   ├── api-catalog.md                  # Каталог 170+ endpoints
+│   └── supabase-react-setup.md         # Руководство: Supabase + React/TypeScript
 ├── docs/
-│   ├── 01-instalacao.md                # Como instalar a skill
-│   ├── 02-autenticacao.md              # Como funciona a autenticacao
-│   ├── 03-guia-rapido.md              # Guia rapido com exemplos
-│   ├── 04-categorias-api.md            # Resumo de todas as categorias
-│   ├── 05-deploy-react-typescript.md   # Deploy completo React+TS
-│   ├── 06-supabase-setup.md            # Setup Supabase (cloud e self-hosted)
-│   ├── 07-troubleshooting.md           # Solucao de problemas comuns
-│   └── 08-seguranca.md                # Boas praticas de seguranca
+│   ├── 01-установка.md                 # Как установить skill
+│   ├── 02-аутентификация.md            # Как работает аутентификация
+│   ├── 03-быстрый-старт.md             # Быстрый старт с примерами
+│   ├── 04-категории-api.md             # Сводка всех категорий
+│   ├── 05-deploy-react-typescript.md   # Полный деплой React+TS
+│   ├── 06-supabase-setup.md            # Настройка Supabase
+│   ├── 07-troubleshooting.md           # Решение типичных проблем
+│   └── 08-безопасность.md              # Рекомендации по безопасности
 └── examples/
-    ├── deploy-react-app.sh             # Exemplo: deploy React app
-    ├── setup-supabase-docker.sh        # Exemplo: Supabase self-hosted
-    ├── backup-automatico.sh            # Exemplo: backup agendado
-    └── setup-completo.sh               # Exemplo: stack completa
+    ├── deploy-react-app.sh             # Пример: деплой React
+    ├── setup-supabase-docker.sh        # Пример: Supabase self-hosted
+    ├── backup-automatico.sh            # Пример: автоматический бэкап
+    └── setup-completo.sh               # Пример: полный стек
 ```
 
-## Instalacao Rapida
+## Быстрая установка
 
-### 1. Copiar a skill para o Claude Code
+### 1. Клонировать и установить
 
 ```bash
-# Clonar o repositorio
 git clone https://github.com/professordyx/aapanel-skill.git
-
-# Copiar para o diretorio de skills do Claude Code
-mkdir -p ~/.claude/skills/aapanel
-cp -r aapanel-skill/SKILL.md ~/.claude/skills/aapanel/
-cp -r aapanel-skill/scripts ~/.claude/skills/aapanel/
-cp -r aapanel-skill/references ~/.claude/skills/aapanel/
+cd aapanel-skill
+bash install.sh
 ```
 
-### 2. Configurar IP na whitelist
+После установки команда `aapanel` станет доступна глобально.
 
-Acesse o painel aaPanel em `https://168.231.92.99:17198` e va em:
-**Settings > API Interface > IP Whitelist** — adicione o IP da sua maquina.
-
-### 3. Testar a conexao
+### 2. Добавить сервер
 
 ```bash
-bash ~/.claude/skills/aapanel/scripts/aapanel_api.sh system GetSystemTotal
+aapanel servers add hetzner https://YOUR_IP:17198 YOUR_API_KEY default
 ```
 
-## Como Usar
+### 3. Добавить IP в whitelist
 
-Apos instalar, basta pedir ao Claude Code em linguagem natural:
+В панели aaPanel: **Settings > API Interface > IP Whitelist** — добавьте IP вашей машины.
 
-- *"Crie um site no servidor para meudominio.com"*
-- *"Faca deploy da minha app React no servidor"*
-- *"Configure o Supabase no servidor"*
-- *"Abra a porta 3000 no firewall"*
-- *"Instale o Node.js 20 no servidor"*
-- *"Faca backup do banco de dados"*
-- *"Veja o status do servidor"*
+```bash
+curl -s https://api.ipify.org  # узнать свой IP
+```
 
-## Categorias de API Disponiveis
+### 4. Проверить подключение
 
-| # | Categoria | Endpoints | Descricao |
-|---|-----------|-----------|-----------|
-| 1 | Sistema | 12 | CPU, memoria, disco, rede, servicos |
-| 2 | Websites | 30+ | Criar, deletar, configurar sites |
-| 3 | Dominios | 3 | Adicionar, listar, remover dominios |
-| 4 | Arquivos | 14 | Upload, download, criar, editar, compactar |
-| 5 | Banco de Dados | 25+ | MySQL: criar, backup, importar |
-| 6 | FTP | 6 | Contas FTP |
-| 7 | Firewall | 20+ | Portas, IPs, forwarding, geo-blocking |
-| 8 | Cron Jobs | 8 | Agendar, executar, monitorar |
-| 9 | SSL/HTTPS | 4 | Let's Encrypt, certificados |
-| 10 | Software | 3 | Instalar, desinstalar plugins |
-| 11 | Node.js | 30+ | Projetos, modulos, dominios, logs |
-| 12 | Python | 20+ | Projetos, pacotes, dominios |
-| 13 | Proxy Reverso | 15+ | Criar, cache, headers |
-| 14 | Backup | 4 | Sites e databases |
-| 15 | Logs | 6 | Painel, sites, erros, cron |
-| 16 | Configuracao | 4 | Painel settings |
-| 17 | DNS | 1+ | Registros DNS (plugin) |
-| 18 | Docker | 3+ | Containers, imagens |
+```bash
+aapanel system GetSystemTotal
+aapanel --server hetzner system GetSystemTotal
+```
 
-> **Total: 170+ endpoints catalogados**
+## Использование
 
-## Stack Recomendada
+После установки можно управлять сервером командами:
 
-| Componente | Tecnologia | Onde |
-|------------|-----------|------|
-| Frontend | React + TypeScript (Vite) | aaPanel Node.js ou static site |
-| Backend API | Supabase (PostgREST) | Supabase Cloud ou Docker |
-| Banco de dados | PostgreSQL (via Supabase) | Supabase Cloud ou Docker |
+```bash
+# Статус системы
+aapanel system GetSystemTotal
+
+# Файлы
+aapanel files GetDir '{"path":"/www/wwwroot"}'
+
+# Node.js проекты
+aapanel nodejs get_project_list
+
+# Открыть порт
+aapanel firewall AddAcceptPort '{"port":"3000","type":"tcp","ps":"React"}'
+
+# SSL
+aapanel ssl apply_cert_api '{"domains":["mysite.com"],"auth_type":"http"}'
+```
+
+Или просто попросите Claude Code на естественном языке:
+
+- *«Создай сайт на сервере для mysite.com»*
+- *«Задеплой React приложение на сервер hetzner»*
+- *«Открой порт 3000 в firewall»*
+- *«Сделай backup базы данных»*
+
+## Управление несколькими серверами
+
+```bash
+# Добавить серверы
+aapanel servers add hetzner https://159.69.216.152:17198 API_KEY_1 default
+aapanel servers add prod    https://10.0.0.1:17198       API_KEY_2
+
+# Список серверов
+aapanel servers list
+
+# Вызов на конкретном сервере
+aapanel --server prod system GetSystemTotal
+
+# Сменить сервер по умолчанию
+aapanel servers default prod
+```
+
+## Категории API
+
+| # | Категория | Endpoints | Описание |
+|---|-----------|-----------|----------|
+| 1 | Система | 12 | CPU, память, диск, сеть, сервисы |
+| 2 | Сайты | 30+ | Создание, удаление, настройка сайтов |
+| 3 | Домены | 3 | Добавление, список, удаление доменов |
+| 4 | Файлы | 14 | Upload, download, создание, редактирование |
+| 5 | Базы данных | 25+ | MySQL: создание, бэкап, импорт |
+| 6 | FTP | 6 | FTP аккаунты |
+| 7 | Firewall | 20+ | Порты, IP, forwarding, geo-blocking |
+| 8 | Cron Jobs | 8 | Планирование, выполнение, мониторинг |
+| 9 | SSL/HTTPS | 4 | Let's Encrypt, сертификаты |
+| 10 | Программы | 3 | Установка, удаление плагинов |
+| 11 | Node.js | 30+ | Проекты, модули, домены, логи |
+| 12 | Python | 20+ | Проекты, пакеты, домены |
+| 13 | Reverse Proxy | 15+ | Создание, кэш, заголовки |
+| 14 | Бэкап | 4 | Сайты и базы данных |
+| 15 | Логи | 6 | Панель, сайты, ошибки, cron |
+| 16 | Конфигурация | 4 | Настройки панели |
+| 17 | DNS | 1+ | DNS записи (плагин) |
+| 18 | Docker | 3+ | Контейнеры, образы |
+
+> **Итого: 170+ задокументированных endpoints**
+
+## Рекомендуемый стек
+
+| Компонент | Технология | Где |
+|-----------|-----------|-----|
+| Frontend | React + TypeScript (Vite) | aaPanel Node.js или статический сайт |
+| Backend API | Supabase (PostgREST) | Supabase Cloud или Docker |
+| База данных | PostgreSQL (через Supabase) | Supabase Cloud или Docker |
 | Auth | Supabase Auth | Supabase |
-| Proxy reverso | Nginx (via aaPanel) | Servidor |
-| SSL | Let's Encrypt (via aaPanel) | Servidor |
+| Reverse Proxy | Nginx (через aaPanel) | Сервер |
+| SSL | Let's Encrypt (через aaPanel) | Сервер |
 
-## Licenca
+## Лицензия
 
 MIT
-
-## Autor
-
-Gerado e mantido com [Claude Code](https://claude.ai/claude-code)

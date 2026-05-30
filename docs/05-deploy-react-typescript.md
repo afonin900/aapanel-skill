@@ -1,148 +1,155 @@
-# Deploy de App React + TypeScript
+# Деплой React + TypeScript приложения
 
-Guia completo para fazer deploy de uma aplicacao React com TypeScript no servidor via aaPanel.
+Полное руководство по деплою React + TypeScript на сервер через aaPanel.
 
-## Opcao A: Site Estatico (Vite Build)
+## Вариант A: Статический сайт (Vite Build)
 
-Para apps React que geram arquivos estaticos (SPA).
+Для React приложений, которые генерируют статические файлы (SPA).
 
-### 1. Build local
+### 1. Локальный build
 
 ```bash
-# No seu projeto local
+# В вашем проекте
 npm run build
-# Gera a pasta dist/
+# Генерирует папку dist/
 ```
 
-### 2. Comprimir para upload
+### 2. Архивировать для загрузки
 
 ```bash
 cd dist
 zip -r ../dist.zip .
 ```
 
-### 3. Hospedar o ZIP (temporariamente)
+### 3. Разместить архив (временно)
 
-Suba o `dist.zip` para algum lugar acessivel por URL (GitHub release, S3, etc.).
+Загрузите `dist.zip` в любое место с публичным URL (GitHub Releases, S3, etc.).
 
-### 4. Deploy no servidor
+### 4. Деплой на сервер
 
 ```bash
-# Criar diretorio
-bash scripts/aapanel_api.sh files CreateDir '{"path":"/www/wwwroot/meu-react-app"}'
+# Создать директорию
+aapanel files CreateDir '{"path":"/www/wwwroot/my-react-app"}'
 
-# Download do build
-bash scripts/aapanel_api.sh files DownloadFile '{"url":"https://URL_DO_ZIP/dist.zip","path":"/www/wwwroot/meu-react-app","filename":"dist.zip"}'
+# Скачать build
+aapanel files DownloadFile '{"url":"https://URL_TO_ZIP/dist.zip","path":"/www/wwwroot/my-react-app","filename":"dist.zip"}'
 
-# Extrair
-bash scripts/aapanel_api.sh files UnZip '{"sfile":"/www/wwwroot/meu-react-app/dist.zip","dfile":"/www/wwwroot/meu-react-app","type":"zip"}'
+# Распаковать
+aapanel files UnZip '{"sfile":"/www/wwwroot/my-react-app/dist.zip","dfile":"/www/wwwroot/my-react-app","type":"zip"}'
 
-# Limpar ZIP
-bash scripts/aapanel_api.sh files DeleteFile '{"path":"/www/wwwroot/meu-react-app/dist.zip"}'
+# Удалить архив
+aapanel files DeleteFile '{"path":"/www/wwwroot/my-react-app/dist.zip"}'
 
-# Criar site Nginx
-bash scripts/aapanel_api.sh site AddSite '{"webname":"{\"domain\":\"meusite.com\",\"domainlist\":[],\"count\":0}","path":"/www/wwwroot/meu-react-app","type_id":0,"type":"PHP","version":"00","port":"80","ps":"React App"}'
+# Создать сайт в Nginx
+aapanel site AddSite '{"webname":"{\"domain\":\"mysite.com\",\"domainlist\":[],\"count\":0}","path":"/www/wwwroot/my-react-app","type_id":0,"type":"PHP","version":"00","port":"80","ps":"React App"}'
 
 # SSL (Let's Encrypt)
-bash scripts/aapanel_api.sh ssl apply_cert_api '{"domains":["meusite.com"],"auth_type":"http"}'
+aapanel ssl apply_cert_api '{"domains":["mysite.com"],"auth_type":"http"}'
 ```
 
-### 5. Configurar SPA routing
+### 5. Настроить SPA routing
 
-Para que o React Router funcione, configure o Nginx para redirecionar tudo para `index.html`:
+Чтобы React Router работал, настройте Nginx перенаправлять всё на `index.html`:
 
 ```bash
-# Ler configuracao atual do Nginx
-bash scripts/aapanel_api.sh files GetFileBody '{"path":"/www/server/panel/vhost/nginx/meusite.com.conf"}'
+# Прочитать текущий конфиг Nginx
+aapanel files GetFileBody '{"path":"/www/server/panel/vhost/nginx/mysite.com.conf"}'
 
-# Adicionar try_files na configuracao
-# (editar via SaveFileBody adicionando: try_files $uri $uri/ /index.html;)
+# Добавить try_files в конфиг (через SaveFileBody)
+# В секции location /: try_files $uri $uri/ /index.html;
 ```
 
 ---
 
-## Opcao B: App SSR/Node.js (Next.js, Remix, etc.)
+## Вариант B: SSR/Node.js приложение (Next.js, Remix, etc.)
 
-Para apps que precisam de servidor Node.js.
+Для приложений, которым нужен Node.js сервер.
 
-### 1. Preparar no servidor
+### 1. Подготовить на сервере
 
 ```bash
-# Criar diretorio
-bash scripts/aapanel_api.sh files CreateDir '{"path":"/www/wwwroot/meu-nextjs"}'
+# Создать директорию
+aapanel files CreateDir '{"path":"/www/wwwroot/my-nextjs"}'
 
-# Verificar Node.js instalado
-bash scripts/aapanel_api.sh nodejs is_install_nodejs
+# Проверить наличие Node.js
+aapanel nodejs is_install_nodejs
 
-# Instalar Node.js se necessario
-bash scripts/aapanel_api.sh plugin install_plugin '{"sName":"nodejs","version":"20"}'
+# Установить Node.js если нужно
+aapanel plugin install_plugin '{"sName":"nodejs","version":"20"}'
 ```
 
-### 2. Upload do projeto
+### 2. Загрузить проект
 
 ```bash
-# Comprimir projeto (excluindo node_modules)
-# Localmente: tar -czf projeto.tar.gz --exclude=node_modules --exclude=.git .
+# Сжать проект (исключая node_modules)
+# Локально: tar -czf project.tar.gz --exclude=node_modules --exclude=.git .
 
-# Download no servidor
-bash scripts/aapanel_api.sh files DownloadFile '{"url":"URL_DO_ARQUIVO","path":"/www/wwwroot/meu-nextjs","filename":"projeto.tar.gz"}'
+# Скачать на сервер
+aapanel files DownloadFile '{"url":"URL_TO_FILE","path":"/www/wwwroot/my-nextjs","filename":"project.tar.gz"}'
 
-# Extrair
-bash scripts/aapanel_api.sh files UnZip '{"sfile":"/www/wwwroot/meu-nextjs/projeto.tar.gz","dfile":"/www/wwwroot/meu-nextjs","type":"tar.gz"}'
+# Распаковать
+aapanel files UnZip '{"sfile":"/www/wwwroot/my-nextjs/project.tar.gz","dfile":"/www/wwwroot/my-nextjs","type":"tar.gz"}'
 ```
 
-### 3. Criar projeto Node.js
+### 3. Создать Node.js проект
 
 ```bash
-# Criar projeto
-bash scripts/aapanel_api.sh nodejs create_project '{"project_name":"meu-nextjs","project_path":"/www/wwwroot/meu-nextjs","run_script":"npm start","node_version":"20","port":"3000"}'
+# Создать проект
+aapanel nodejs create_project '{"project_name":"my-nextjs","project_path":"/www/wwwroot/my-nextjs","run_script":"npm start","node_version":"20","port":"3000"}'
 
-# Instalar dependencias
-bash scripts/aapanel_api.sh nodejs install_packages '{"project_name":"meu-nextjs"}'
+# Установить зависимости
+aapanel nodejs install_packages '{"project_name":"my-nextjs"}'
 ```
 
-### 4. Configurar acesso externo
+### 4. Настроить внешний доступ
 
 ```bash
-# Abrir porta no firewall
-bash scripts/aapanel_api.sh firewall AddAcceptPort '{"port":"3000","type":"tcp","ps":"Next.js"}'
+# Открыть порт
+aapanel firewall AddAcceptPort '{"port":"3000","type":"tcp","ps":"Next.js"}'
 
-# Configurar proxy reverso (Nginx -> Node)
-bash scripts/aapanel_api.sh nodejs bind_extranet '{"project_name":"meu-nextjs"}'
+# Reverse proxy (Nginx → Node)
+aapanel nodejs bind_extranet '{"project_name":"my-nextjs"}'
 
-# Adicionar dominio
-bash scripts/aapanel_api.sh nodejs project_add_domain '{"project_name":"meu-nextjs","domain":"meusite.com"}'
+# Добавить домен
+aapanel nodejs project_add_domain '{"project_name":"my-nextjs","domain":"mysite.com"}'
 ```
 
-### 5. Iniciar e monitorar
+### 5. Запустить и мониторить
 
 ```bash
-# Iniciar
-bash scripts/aapanel_api.sh nodejs start_project '{"project_name":"meu-nextjs"}'
+# Запустить
+aapanel nodejs start_project '{"project_name":"my-nextjs"}'
 
-# Verificar status
-bash scripts/aapanel_api.sh nodejs get_project_run_state '{"project_name":"meu-nextjs"}'
+# Проверить статус
+aapanel nodejs get_project_run_state '{"project_name":"my-nextjs"}'
 
-# Ver logs
-bash scripts/aapanel_api.sh nodejs get_project_log '{"project_name":"meu-nextjs"}'
+# Просмотреть логи
+aapanel nodejs get_project_log '{"project_name":"my-nextjs"}'
 ```
 
 ---
 
-## Variaveis de Ambiente
+## Переменные окружения
 
-Para configurar `.env` no servidor:
-
-```bash
-bash scripts/aapanel_api.sh files SaveFileBody '{"path":"/www/wwwroot/meu-app/.env","data":"VITE_SUPABASE_URL=https://xxxx.supabase.co\nVITE_SUPABASE_ANON_KEY=eyJhbGciOi...\nNODE_ENV=production","encoding":"utf-8"}'
-```
-
-## CI/CD Automatizado
-
-Crie um cron job para pull automatico do Git:
+Создать `.env` файл на сервере:
 
 ```bash
-bash scripts/aapanel_api.sh crontab AddCrontab '{"name":"Deploy React App","type":"minute","hour":"","minute":"30","sBody":"cd /www/wwwroot/meu-app && git pull && npm install && npm run build","sType":"toShell"}'
+aapanel files SaveFileBody '{"path":"/www/wwwroot/my-app/.env","data":"VITE_SUPABASE_URL=https://xxxx.supabase.co\nVITE_SUPABASE_ANON_KEY=eyJhbGciOi...\nNODE_ENV=production","encoding":"utf-8"}'
 ```
 
-Ou use GitHub Actions chamando a API do aaPanel diretamente.
+## CI/CD автоматизация
+
+Cron job для автоматического pull и деплоя:
+
+```bash
+aapanel crontab AddCrontab '{"name":"Deploy React App","type":"minute","hour":"","minute":"30","sBody":"cd /www/wwwroot/my-app && git pull && npm install && npm run build","sType":"toShell"}'
+```
+
+Или используйте GitHub Actions, вызывая API aaPanel напрямую.
+
+## На конкретном сервере
+
+```bash
+aapanel --server hetzner files CreateDir '{"path":"/www/wwwroot/my-react-app"}'
+aapanel --server hetzner nodejs create_project '{"project_name":"my-react","project_path":"/www/wwwroot/my-react","run_script":"npm start","node_version":"20","port":"3000"}'
+```
