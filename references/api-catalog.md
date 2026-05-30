@@ -709,57 +709,83 @@ POST /safe/ssh/GetSshInfo                  # Info SSH
 
 ## 8. Cron Jobs
 
-### Listar tarefas
+> **AAPanel 8.x breaking change:** All crontab operations moved to `/v2/crontab`.
+> The `action` parameter is now sent in the **POST body** (not the URL).
+> The `aapanel` script handles this automatically — no changes needed at call sites.
+
+### Listar tarefas / List tasks
 ```
-POST /crontab?action=GetCrontab
-POST /data?action=getData&table=crontab
+POST /v2/crontab   action=GetCrontab
 ```
 | Parâmetro | Tipo | Descrição |
 |-----------|------|-----------|
-| `p` | int | Página |
-| `limit` | int | Itens por página |
+| `p` | int | Página / Page |
+| `limit` | int | Itens por página / Items per page |
 
-### Criar tarefa
+### Criar tarefa / Create task
 ```
-POST /crontab?action=AddCrontab
+POST /v2/crontab   action=AddCrontab
 ```
 | Parâmetro | Tipo | Descrição |
 |-----------|------|-----------|
-| `name` | string | Nome da tarefa |
-| `type` | string | Tipo (minute, hour, day, week, month) |
-| `hour` | string | Hora |
-| `minute` | string | Minuto |
-| `sBody` | string | Comando/script |
-| `sType` | string | Tipo: toShell, toFile, toUrl, database, site |
-| `backupTo` | string | Destino do backup |
-| `sName` | string | Nome do site/DB (para backups) |
-| `save` | int | Quantidade de backups a manter |
-| `week` | string | Dia da semana (para type=week) |
-| `where1` | string | Destino alternativo |
+| `name` | string | Nome da tarefa / Task name |
+| `type` | string | Schedule: `day`, `hour`, `minute-n`, `week`, `month` |
+| `where1` | string | Interval in minutes for `minute-n`; empty for others |
+| `hour` | int | Hora / Hour |
+| `minute` | int | Minuto / Minute |
+| `sType` | string | Tipo / Type: `toShell`, `toUrl`, `database`, `site` |
+| `sBody` | string | Comando shell / Shell command (for `toShell`) |
+| `sName` | string | Nome do site/DB (para backups); empty for shell |
+| `save` | int | Backups a manter / Backups to keep; `0` for shell |
+| `backupTo` | string | Destino backup / Backup destination (`localhost`); empty for shell |
+| `urladdress` | string | URL (for `toUrl`); empty otherwise |
+| `save_local` | int | `0` or `1` |
+| `notice` | int | Notificações / Notifications: `0` or `1` |
+| `notice_channel` | string | Canal de notificação / Notification channel; empty |
 
-### Deletar tarefa
-```
-POST /crontab?action=DelCrontab            # (id)
-```
-
-### Executar imediatamente
-```
-POST /crontab?action=StartTask             # (id)
-```
-
-### Habilitar/desabilitar
-```
-POST /crontab?action=set_cron_status       # (id, status)
+**Example — shell script every day at 4:00:**
+```bash
+aapanel crontab AddCrontab '{
+  "name":"deploy","type":"day","where1":"","hour":4,"minute":0,
+  "sType":"toShell","sBody":"/www/scripts/deploy.sh",
+  "sName":"","save":0,"backupTo":"localhost",
+  "urladdress":"","save_local":0,"notice":0,"notice_channel":""
+}'
 ```
 
-### Modificar tarefa
-```
-POST /crontab?action=modify_crond          # (parâmetros da tarefa)
+**Example — every 100 minutes:**
+```bash
+aapanel crontab AddCrontab '{
+  "name":"health","type":"minute-n","where1":"100","hour":0,"minute":0,
+  "sType":"toShell","sBody":"curl -sf http://localhost/health",
+  "sName":"","save":0,"backupTo":"localhost",
+  "urladdress":"","save_local":0,"notice":0,"notice_channel":""
+}'
 ```
 
-### Logs da tarefa
+### Deletar tarefa / Delete task
 ```
-POST /crontab?action=GetLogs               # (id)
+POST /v2/crontab   action=DelCrontab   id=<id>
+```
+
+### Executar imediatamente / Run immediately
+```
+POST /v2/crontab   action=StartTask    id=<id>
+```
+
+### Habilitar/desabilitar / Enable/disable
+```
+POST /v2/crontab   action=set_cron_status   id=<id>   status=<0|1>
+```
+
+### Modificar tarefa / Edit task
+```
+POST /v2/crontab   action=EditCrontab   id=<id>   <+ all AddCrontab fields>
+```
+
+### Logs da tarefa / Task logs
+```
+POST /v2/crontab   action=GetLogs   id=<id>
 ```
 
 ---
