@@ -709,57 +709,84 @@ POST /safe/ssh/GetSshInfo                  # Info SSH
 
 ## 8. Cron Jobs
 
-### Listar tarefas
-```
-POST /crontab?action=GetCrontab
-POST /data?action=getData&table=crontab
-```
-| Parâmetro | Tipo | Descrição |
-|-----------|------|-----------|
-| `p` | int | Página |
-| `limit` | int | Itens por página |
+> **AAPanel 8.x (v2 API):** все crontab-операции используют `/v2/crontab` с `action` в POST-теле.
+> Скрипт `aapanel` направляет категорию `crontab` на этот endpoint автоматически.
 
-### Criar tarefa
+### Список задач
 ```
-POST /crontab?action=AddCrontab
+POST /v2/crontab  action=GetCrontab
 ```
-| Parâmetro | Tipo | Descrição |
-|-----------|------|-----------|
-| `name` | string | Nome da tarefa |
-| `type` | string | Tipo (minute, hour, day, week, month) |
-| `hour` | string | Hora |
-| `minute` | string | Minuto |
-| `sBody` | string | Comando/script |
-| `sType` | string | Tipo: toShell, toFile, toUrl, database, site |
-| `backupTo` | string | Destino do backup |
-| `sName` | string | Nome do site/DB (para backups) |
-| `save` | int | Quantidade de backups a manter |
-| `week` | string | Dia da semana (para type=week) |
-| `where1` | string | Destino alternativo |
+| Параметр | Тип | Описание |
+|----------|-----|----------|
+| `p` | int | Страница |
+| `limit` | int | Задач на страницу |
 
-### Deletar tarefa
+### Создать задачу
 ```
-POST /crontab?action=DelCrontab            # (id)
+POST /v2/crontab  action=AddCrontab
 ```
+| Параметр | Тип | Описание |
+|----------|-----|----------|
+| `name` | string | Название задачи |
+| `type` | string | Расписание: `day`, `hour`, `minute-n`, `week`, `month` |
+| `where1` | string | Интервал для `minute-n` (число минут); пусто для других |
+| `hour` | int | Час запуска (для `day`, `hour`) |
+| `minute` | int | Минута запуска |
+| `sType` | string | Тип: `toShell`, `toUrl`, `database`, `site` |
+| `sBody` | string | Shell-команда (для `toShell`) |
+| `sName` | string | Имя сайта/БД (для `site`/`database`); пусто для shell |
+| `save` | int | Количество бэкапов; `0` для shell |
+| `backupTo` | string | Место бэкапа (`localhost`); пусто для shell |
+| `urladdress` | string | URL (для `toUrl`); пусто |
+| `save_local` | int | `0` или `1` |
+| `notice` | int | Уведомления: `0` или `1` |
+| `notice_channel` | string | Канал уведомлений; пусто |
 
-### Executar imediatamente
-```
-POST /crontab?action=StartTask             # (id)
-```
-
-### Habilitar/desabilitar
-```
-POST /crontab?action=set_cron_status       # (id, status)
-```
-
-### Modificar tarefa
-```
-POST /crontab?action=modify_crond          # (parâmetros da tarefa)
+**Пример — shell-скрипт каждый день в 4:00:**
+```bash
+aapanel crontab AddCrontab '{
+  "name":"daily-deploy","type":"day","where1":"",
+  "hour":4,"minute":0,
+  "sType":"toShell","sBody":"/www/scripts/deploy.sh",
+  "sName":"","save":0,"backupTo":"localhost",
+  "urladdress":"","save_local":0,"notice":0,"notice_channel":""
+}'
 ```
 
-### Logs da tarefa
+**Пример — каждые 100 минут:**
+```bash
+aapanel crontab AddCrontab '{
+  "name":"health-check","type":"minute-n","where1":"100",
+  "hour":0,"minute":0,
+  "sType":"toShell","sBody":"curl -s http://localhost/health",
+  "sName":"","save":0,"backupTo":"localhost",
+  "urladdress":"","save_local":0,"notice":0,"notice_channel":""
+}'
 ```
-POST /crontab?action=GetLogs               # (id)
+
+### Удалить задачу
+```
+POST /v2/crontab  action=DelCrontab  id=<id>
+```
+
+### Запустить немедленно
+```
+POST /v2/crontab  action=StartTask  id=<id>
+```
+
+### Включить/выключить
+```
+POST /v2/crontab  action=set_cron_status  id=<id>  status=<0|1>
+```
+
+### Изменить задачу
+```
+POST /v2/crontab  action=EditCrontab  id=<id>  <+ все поля как в AddCrontab>
+```
+
+### Логи задачи
+```
+POST /v2/crontab  action=GetLogs  id=<id>
 ```
 
 ---

@@ -143,15 +143,26 @@ aapanel ssl apply_cert_api '{"domains":["mysite.com"],"auth_type":"http"}'
 
 ## Выполнение shell-команд через cron
 
-Ключевая фича для деплоя и автоматизации — запуск shell-команд через crontab `toShell`:
+Ключевая фича для деплоя и автоматизации — запуск shell-команд через crontab `toShell`.
+
+> **AAPanel 8.x:** используется `/v2/crontab`. Скрипт направляет туда автоматически.
+> Обязательные поля: `sType`, `sName`, `save`, `backupTo`, `urladdress`, `save_local`, `notice`, `notice_channel`.
 
 ```bash
-# Разовое выполнение команды (создать задачу и сразу запустить)
-aapanel crontab AddCrontab '{"name":"Deploy","type":"day","hour":"3","minute":"0","sBody":"cd /www/wwwroot/my-app && git pull && npm install && npm run build","sType":"toShell"}'
+# Каждый день в 3:00
+aapanel crontab AddCrontab '{
+  "name":"Deploy","type":"day","where1":"","hour":3,"minute":0,
+  "sType":"toShell","sBody":"cd /www/wwwroot/my-app && git pull && npm run build",
+  "sName":"","save":0,"backupTo":"localhost","urladdress":"","save_local":0,"notice":0,"notice_channel":""
+}'
+
+# Каждые 100 минут
+aapanel crontab AddCrontab '{
+  "name":"Health","type":"minute-n","where1":"100","hour":0,"minute":0,
+  "sType":"toShell","sBody":"curl -sf http://localhost/health || systemctl restart myapp",
+  "sName":"","save":0,"backupTo":"localhost","urladdress":"","save_local":0,"notice":0,"notice_channel":""
+}'
 
 # Запустить задачу немедленно
 aapanel crontab StartTask '{"id":TASK_ID}'
-
-# Автозапуск при старте сервера
-aapanel crontab AddCrontab '{"name":"Start App","type":"startUp","sBody":"cd /www/wwwroot/my-app && npm start","sType":"toShell"}'
 ```

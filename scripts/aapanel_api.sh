@@ -100,6 +100,14 @@ generate_auth() {
 }
 
 # --- Build endpoint URL ---
+# Categories using /v2/<category> API (action passed in POST body, not URL)
+is_v2_category() {
+    case "$1" in
+        crontab) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 build_url() {
     local base_url="$1"
     local category="$2"
@@ -113,7 +121,7 @@ build_url() {
         database) echo "${base_url}/database?action=${action}" ;;
         ftp)      echo "${base_url}/ftp?action=${action}" ;;
         firewall) echo "${base_url}/firewall?action=${action}" ;;
-        crontab)  echo "${base_url}/crontab?action=${action}" ;;
+        crontab)  echo "${base_url}/v2/crontab" ;;
         plugin)   echo "${base_url}/plugin?action=${action}" ;;
         ssl|acme) echo "${base_url}/acme?action=${action}" ;;
         config)   echo "${base_url}/config?action=${action}" ;;
@@ -366,6 +374,10 @@ main() {
     auth=$(generate_auth "$api_key")
 
     local form_data="$auth"
+    # v2 API endpoints receive action in POST body, not the URL
+    if is_v2_category "$category"; then
+        form_data="action=${action}&${form_data}"
+    fi
     if [ -n "$params" ]; then
         local extra
         extra=$(json_to_form "$params")
