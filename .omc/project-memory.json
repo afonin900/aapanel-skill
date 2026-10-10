@@ -34,7 +34,20 @@
       "branchingStrategy": null
     }
   },
-  "customNotes": [],
+  "customNotes": [
+    {
+      "timestamp": 1780130908307,
+      "source": "manual",
+      "category": "architecture",
+      "content": "AAPanel 8.x (8.11.0+): все crontab-операции на /v2/crontab, action в POST body. Тип \"каждые N минут\" = \"minute-n\" (не \"minute\"). Обязательные поля: sType, sName, save, backupTo, urladdress, save_local, notice, notice_channel. Зафиксировано в references/api-catalog.md."
+    },
+    {
+      "timestamp": 1780130908666,
+      "source": "manual",
+      "category": "deploy",
+      "content": "PR #2 открыт в professordyx/aapanel-skill (upstream) — фикс crontab v2. Ветка fix/crontab-v2-upstream. Ждёт ревью мейнтейнера."
+    }
+  ],
   "directoryMap": {
     "docs": {
       "path": "docs",
@@ -84,8 +97,20 @@
   "hotPaths": [
     {
       "path": "scripts/aapanel_api.sh",
-      "accessCount": 5,
-      "lastAccessed": 1780121190805,
+      "accessCount": 12,
+      "lastAccessed": 1780130341639,
+      "type": "file"
+    },
+    {
+      "path": "references/api-catalog.md",
+      "accessCount": 8,
+      "lastAccessed": 1780130366161,
+      "type": "file"
+    },
+    {
+      "path": "SKILL.md",
+      "accessCount": 4,
+      "lastAccessed": 1780130134000,
       "type": "file"
     },
     {
@@ -95,21 +120,15 @@
       "type": "file"
     },
     {
-      "path": "references/api-catalog.md",
+      "path": "tests/test_aapanel.sh",
       "accessCount": 3,
-      "lastAccessed": 1780121492925,
+      "lastAccessed": 1780122537251,
       "type": "file"
     },
     {
       "path": "README.md",
       "accessCount": 2,
       "lastAccessed": 1780121262394,
-      "type": "file"
-    },
-    {
-      "path": "SKILL.md",
-      "accessCount": 2,
-      "lastAccessed": 1780121296112,
       "type": "file"
     },
     {
@@ -195,7 +214,40 @@
       "accessCount": 1,
       "lastAccessed": 1780121467411,
       "type": "file"
+    },
+    {
+      "path": "tests/mock_server.py",
+      "accessCount": 1,
+      "lastAccessed": 1780122438895,
+      "type": "file"
+    },
+    {
+      "path": "tests/run_tests.sh",
+      "accessCount": 1,
+      "lastAccessed": 1780122509427,
+      "type": "file"
+    },
+    {
+      "path": "docs/architecture-decisions.md",
+      "accessCount": 1,
+      "lastAccessed": 1780135880651,
+      "type": "file"
     }
   ],
-  "userDirectives": []
+  "userDirectives": [
+    {
+      "timestamp": 1780121865235,
+      "directive": "После завершения всех фаз autopilot ОБЯЗАТЕЛЬНО вызвать /oh-my-claudecode:cancel ДО финального сообщения пользователю (Phase 5 по инструкции). Без этого stop hook заблокирует выход.",
+      "context": "autopilot завершился без вызова /cancel, stop hook заблокировал выход и потребовал ручной очистки state",
+      "source": "explicit",
+      "priority": "high"
+    },
+    {
+      "timestamp": 1780130908973,
+      "directive": "При проблемах с API endpoint — сначала Context7 (resolve-library-id \"aaPanel\" → query-docs), не перебор параметров. Library ID: /aapanel/aapanel.",
+      "context": "В сессии 2026-05-30 сделали 8+ попыток перебора вместо одного запроса в Context7, который сразу дал ответ.",
+      "source": "explicit",
+      "priority": "high"
+    }
+  ]
 }
